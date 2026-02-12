@@ -12,6 +12,7 @@ import { MetamaskNotificationsProvider } from '../contexts/metamask-notification
 import { AssetPollingProvider } from '../contexts/assetPolling';
 import { MetamaskIdentityProvider } from '../contexts/identity';
 import { ShieldSubscriptionProvider } from '../contexts/shield/shield-subscription';
+import { UIMessengerProvider } from '../contexts/messenger-context';
 import RiveWasmProvider from '../contexts/rive-wasm';
 import ErrorPage from './error-page/error-page.component';
 
@@ -30,7 +31,7 @@ class Index extends PureComponent {
 
   render() {
     const { error } = this.state;
-    const { store } = this.props;
+    const { store, uiMessenger } = this.props;
 
     if (error) {
       return (
@@ -48,6 +49,11 @@ class Index extends PureComponent {
       );
     }
 
+    //========
+    // Note the addition of a new context here to expose the UI messenger to
+    // anywhere in the React hierarchy. We need this to be able to derive
+    // route-based messengers.
+    //========
     return (
       <Provider store={store}>
         <HashRouter>
@@ -60,7 +66,9 @@ class Index extends PureComponent {
                       <MetamaskNotificationsProvider>
                         <ShieldSubscriptionProvider>
                           <RiveWasmProvider>
-                            <Routes />
+                            <UIMessengerProvider messenger={uiMessenger}>
+                              <Routes />
+                            </UIMessengerProvider>
                           </RiveWasmProvider>
                         </ShieldSubscriptionProvider>
                       </MetamaskNotificationsProvider>

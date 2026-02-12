@@ -5,8 +5,20 @@
 // as the parent for more specific messengers.
 //========
 
+//========
+// We amend this file to add `BridgeController:trackUnifiedSwapBridgeEvent` and
+// `NetworkController:addNetwork` to the list of available actions (so that we
+// can access them in the UI), and we also expose the set of all actions and
+// events on the UI messenger, as we need that in other places.
+//========
+
 import { ActionConstraint, Messenger } from '@metamask/messenger';
 import { AccountTreeControllerSelectedAccountGroupChangeEvent } from '@metamask/account-tree-controller';
+import {
+  BridgeBackgroundAction,
+  type BridgeControllerAction,
+} from '@metamask/bridge-controller';
+import { NetworkControllerAddNetworkAction } from '@metamask/network-controller';
 import { NotificationServicesController } from '@metamask/notification-services-controller';
 import { KeyringControllerUnlockEvent } from '@metamask/keyring-controller';
 import { ShieldControllerCheckCoverageAction } from '@metamask/shield-controller';
@@ -54,7 +66,9 @@ type AsynchronizeActions<Action> = Action extends ActionConstraint
     }
   : never;
 
-type Actions = AsynchronizeActions<
+export type UIMessengerActions = AsynchronizeActions<
+  | BridgeControllerAction<BridgeBackgroundAction.TRACK_METAMETRICS_EVENT>
+  | NetworkControllerAddNetworkAction
   | NotificationServicesController.NotificationServicesControllerUpdateMetamaskNotificationsList
   | RewardsControllerGetSeasonMetadataAction
   | RewardsControllerGetSeasonStatusAction
@@ -63,13 +77,19 @@ type Actions = AsynchronizeActions<
   | WalletServiceGetCodeAction
 >;
 
-type Events =
+export type UIMessengerEvents =
   | AccountTreeControllerSelectedAccountGroupChangeEvent
   | KeyringControllerUnlockEvent;
 
-export type UIMessenger = Messenger<'UI', Actions, Events>;
+export type UIMessenger = Messenger<
+  'UI',
+  UIMessengerActions,
+  UIMessengerEvents
+>;
 
 const ACTIONS = [
+  'BridgeController:trackUnifiedSwapBridgeEvent',
+  'NetworkController:addNetwork',
   'NotificationServicesController:updateMetamaskNotificationsList',
   'RewardsController:getSeasonMetadata',
   'RewardsController:getSeasonStatus',
@@ -104,7 +124,9 @@ export async function getUIMessenger(
   });
 
   for (const action of ACTIONS) {
-    const handler = async (...args: Parameters<Actions['handler']>) => {
+    const handler = async (
+      ...args: Parameters<UIMessengerActions['handler']>
+    ) => {
       return await backgroundConnection.send({
         method: action,
         params: args,

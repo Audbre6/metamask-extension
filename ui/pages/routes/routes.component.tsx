@@ -549,6 +549,19 @@ export default function Routes() {
         component: Settings,
         layout: RootLayout,
         authenticated: true,
+        //========
+        // Here is where we can associate which messenger actions and events
+        // (capabilities) this route has access to. A messenger will get created
+        // with these capabilities.
+        //
+        // In the future, when we want to access a new capability in a component
+        // reachable from the home route, we can come here and update this list.
+        //
+        // And as we go along we can add this option to other routes.
+        //========
+        messenger: {
+          actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
+        },
       }),
       createRouteWithLayout({
         path: NOTIFICATIONS_SETTINGS_ROUTE,
@@ -615,6 +628,9 @@ export default function Routes() {
         component: CrossChainSwap,
         layout: RootLayout,
         authenticated: true,
+        messenger: {
+          actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
+        },
       }),
       createRouteWithLayout({
         path: CONFIRM_ADD_SUGGESTED_TOKEN_ROUTE,
@@ -657,18 +673,27 @@ export default function Routes() {
         component: Asset,
         layout: RootLayout,
         authenticated: true,
+        messenger: {
+          actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
+        },
       }),
       createRouteWithLayout({
         path: `${ASSET_ROUTE}/:chainId/:asset/`,
         component: Asset,
         layout: RootLayout,
         authenticated: true,
+        messenger: {
+          actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
+        },
       }),
       createRouteWithLayout({
         path: `${ASSET_ROUTE}/:chainId`,
         component: Asset,
         layout: RootLayout,
         authenticated: true,
+        messenger: {
+          actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
+        },
       }),
       createRouteWithLayout({
         path: `${DEFI_ROUTE}/:chainId/:protocolId`,
@@ -807,6 +832,12 @@ export default function Routes() {
         component: Home,
         layout: RootLayout,
         authenticated: true,
+        messenger: {
+          actions: [
+            'BridgeController:trackUnifiedSwapBridgeEvent',
+            'NetworkController:addNetwork',
+          ],
+        },
       }),
     ],
     [],
