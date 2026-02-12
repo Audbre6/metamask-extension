@@ -78,6 +78,7 @@ class Index extends PureComponent {
 
 Index.propTypes = {
   store: PropTypes.object,
+  uiMessenger: PropTypes.object,
 };
 
 export default Index;
