@@ -7,35 +7,34 @@
 import React, { ReactNode, useMemo } from 'react';
 import { Messenger } from '@metamask/messenger';
 import {
-  UIMessenger,
   UIMessengerActions,
   UIMessengerEvents,
 } from '../messengers/ui-messenger';
+import type { TeamMessenger } from '../messengers/team-messenger';
 import { RouteMessengerContext } from '../contexts/route-messenger';
 import {
   ROUTE_MESSENGER_NAMESPACE,
   RouteMessenger,
 } from '../messengers/route-messenger';
-import { useUIMessenger } from '../contexts/ui-messenger';
 
 /**
- * Derives a messenger for a route from the UI messenger.
+ * Derives a messenger for a route from a team messenger.
  *
  * This is used when defining routes (that is, each route gets its own
  * messenger).
  *
  * @param args - Arguments for this function.
- * @param args.uiMessenger - The parent UI messenger.
- * @param args.actions - Action types to delegate from the UI messenger.
- * @param args.events - Event types to delegate from the UI messenger.
+ * @param args.parent - The team messenger to use as the parent.
+ * @param args.actions - Action types to delegate from the parent messenger.
+ * @param args.events - Event types to delegate from the parent messenger.
  * @returns A messenger with access to the specified actions and events.
  */
 function createRouteMessenger({
-  uiMessenger,
+  parent,
   actions = [],
   events = [],
 }: {
-  uiMessenger: UIMessenger;
+  parent: TeamMessenger;
   actions?: UIMessengerActions['type'][];
   events?: UIMessengerEvents['type'][];
 }): RouteMessenger {
@@ -48,14 +47,14 @@ function createRouteMessenger({
     typeof ROUTE_MESSENGER_NAMESPACE,
     UIMessengerActions,
     UIMessengerEvents,
-    UIMessenger
+    TeamMessenger
   >({
     namespace: ROUTE_MESSENGER_NAMESPACE,
-    parent: uiMessenger,
+    parent,
   });
 
   if (actions.length > 0 || events.length > 0) {
-    uiMessenger.delegate({
+    parent.delegate({
       messenger: routeMessenger,
       actions,
       events,
@@ -72,24 +71,29 @@ function createRouteMessenger({
  * provides it to children via context.
  *
  * @param props - Component props.
+ * @param props.parent - The team messenger to use as the parent.
  * @param props.actions - Action types to delegate to the route messenger.
  * @param props.events - Event types to delegate to the route messenger.
  * @param props.children - Child components.
  */
 export const RouteWithMessenger = ({
+  parent,
   actions,
   events,
   children,
 }: {
+  //========
+  // A parent must be specified when defining a route messenger. We use this to
+  // assign routes to teams.
+  //========
+  parent: TeamMessenger;
   actions?: UIMessengerActions['type'][];
   events?: UIMessengerEvents['type'][];
   children: ReactNode;
 }) => {
-  const uiMessenger = useUIMessenger();
-
   const routeMessenger = useMemo(() => {
-    return createRouteMessenger({ uiMessenger, actions, events });
-  }, [uiMessenger, actions, events]);
+    return createRouteMessenger({ parent, actions, events });
+  }, [parent, actions, events]);
 
   return (
     <RouteMessengerContext.Provider value={routeMessenger}>

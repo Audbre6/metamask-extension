@@ -12,7 +12,8 @@ import { MetamaskNotificationsProvider } from '../contexts/metamask-notification
 import { AssetPollingProvider } from '../contexts/assetPolling';
 import { MetamaskIdentityProvider } from '../contexts/identity';
 import { ShieldSubscriptionProvider } from '../contexts/shield/shield-subscription';
-import { UIMessengerProvider } from '../contexts/messenger-context';
+import { UIMessengerProvider } from '../contexts/ui-messenger';
+import { TeamMessengerRegistryProvider } from '../contexts/team-messenger-registry';
 import RiveWasmProvider from '../contexts/rive-wasm';
 import ErrorPage from './error-page/error-page.component';
 
@@ -54,6 +55,10 @@ class Index extends PureComponent {
     // anywhere in the React hierarchy. We need this to be able to derive
     // route-based messengers.
     //========
+    //========
+    // In this commit we've added another context to expose the team messenger
+    // registry in a similar way as the UI messenger.
+    //========
     return (
       <Provider store={store}>
         <HashRouter>
@@ -67,7 +72,9 @@ class Index extends PureComponent {
                         <ShieldSubscriptionProvider>
                           <RiveWasmProvider>
                             <UIMessengerProvider messenger={uiMessenger}>
-                              <Routes />
+                              <TeamMessengerRegistryProvider>
+                                <Routes />
+                              </TeamMessengerRegistryProvider>
                             </UIMessengerProvider>
                           </RiveWasmProvider>
                         </ShieldSubscriptionProvider>

@@ -6,6 +6,7 @@ import type {
   UIMessengerActions,
   UIMessengerEvents,
 } from '../messengers/ui-messenger';
+import type { TeamMessenger } from '../messengers/team-messenger';
 import type { RootLayout } from './root-layout';
 import type { LegacyLayout } from './legacy-layout';
 import { RouteWithMessenger } from './route-with-messenger';
@@ -26,7 +27,14 @@ export type RouteWithLayoutConfig = {
   // actions and events which that messenger should have access to.
   // (Right now this is optional, but eventually it will be required.)
   //========
+  //========
+  // In this commit, we add a `parent` argument. Despite its name, it must be a
+  // team messenger. This effectively allows us to places routes under teams.
+  // (We may change this requirement and allow other children of UI messengers
+  // later.)
+  //========
   messenger?: {
+    parent: TeamMessenger;
     actions?: UIMessengerActions['type'][];
     events?: UIMessengerEvents['type'][];
   };
@@ -68,7 +76,11 @@ export const createRouteWithLayout = (
   // Wrap with RouteWithMessenger first
   if (messenger && content) {
     content = (
-      <RouteWithMessenger actions={messenger.actions} events={messenger.events}>
+      <RouteWithMessenger
+        parent={messenger.parent}
+        actions={messenger.actions}
+        events={messenger.events}
+      >
         {content}
       </RouteWithMessenger>
     );

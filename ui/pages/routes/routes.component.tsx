@@ -142,6 +142,7 @@ import { MultichainReviewPermissions } from '../../components/multichain-account
 import { RootLayout } from '../../layouts/root-layout';
 import { LegacyLayout } from '../../layouts/legacy-layout';
 import { createRouteWithLayout } from '../../layouts/route-with-layout';
+import { useTeamMessengerRegistry } from '../../contexts/team-messenger-registry';
 import { getConnectingLabel, setTheme } from './utils';
 import { ConfirmationHandler } from './confirmation-handler';
 import { Modals } from './modals';
@@ -349,6 +350,13 @@ export default function Routes() {
   const location = useLocation();
   const navType = useNavigationType();
 
+  //========
+  // Each route is associated with a team messenger, and all team messengers are
+  // pre-built and kept in a registry. We load the registry and update all
+  // routes below with appropriate parents.
+  //========
+  const teamMessengerRegistry = useTeamMessengerRegistry();
+
   const alertOpen = useAppSelector((state) => state.appState.alertOpen);
   const alertMessage = useAppSelector((state) => state.appState.alertMessage);
   const isLoading = useAppSelector((state) => state.appState.isLoading);
@@ -555,11 +563,11 @@ export default function Routes() {
         // with these capabilities.
         //
         // In the future, when we want to access a new capability in a component
-        // reachable from the home route, we can come here and update this list.
-        //
+        // reachable from this route, we can come here and update this list.
         // And as we go along we can add this option to other routes.
         //========
         messenger: {
+          parent: teamMessengerRegistry.extensionPlatformTeam,
           actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
         },
       }),
@@ -629,6 +637,7 @@ export default function Routes() {
         layout: RootLayout,
         authenticated: true,
         messenger: {
+          parent: teamMessengerRegistry.swapsAndBridgeTeam,
           actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
         },
       }),
@@ -674,6 +683,7 @@ export default function Routes() {
         layout: RootLayout,
         authenticated: true,
         messenger: {
+          parent: teamMessengerRegistry.assetsTeam,
           actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
         },
       }),
@@ -683,6 +693,7 @@ export default function Routes() {
         layout: RootLayout,
         authenticated: true,
         messenger: {
+          parent: teamMessengerRegistry.assetsTeam,
           actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
         },
       }),
@@ -692,6 +703,7 @@ export default function Routes() {
         layout: RootLayout,
         authenticated: true,
         messenger: {
+          parent: teamMessengerRegistry.assetsTeam,
           actions: ['BridgeController:trackUnifiedSwapBridgeEvent'],
         },
       }),
@@ -833,6 +845,7 @@ export default function Routes() {
         layout: RootLayout,
         authenticated: true,
         messenger: {
+          parent: teamMessengerRegistry.extensionPlatformTeam,
           actions: [
             'BridgeController:trackUnifiedSwapBridgeEvent',
             'NetworkController:addNetwork',
@@ -840,7 +853,11 @@ export default function Routes() {
         },
       }),
     ],
-    [],
+    [
+      teamMessengerRegistry.extensionPlatformTeam,
+      teamMessengerRegistry.swapsAndBridgeTeam,
+      teamMessengerRegistry.assetsTeam,
+    ],
   );
 
   // Use useRoutes hook to render routes - called on every render to track location changes
