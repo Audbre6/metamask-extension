@@ -136,6 +136,7 @@ import { isSnapId } from '@metamask/snaps-utils';
 import {
   findAtomicBatchSupportForChain,
   checkEip7702Support,
+  getEip7702SupportedChains,
 } from '../../shared/lib/eip7702-support-utils';
 import { createEIP7702UpgradeTransaction } from '../../shared/lib/eip7702-utils';
 import {
@@ -1192,8 +1193,23 @@ export default class MetamaskController extends EventEmitter {
           throw rpcErrors.methodNotSupported('No permission type provided');
         }
 
-        for (const param of params) {
-          const permissionType = param?.permission?.type;
+        const supportedChains = getEip7702SupportedChains(
+          this.remoteFeatureFlagController.state,
+        );
+
+        const unsupportedChains = params
+          .filter(({ chainId }) => !supportedChains.includes(chainId))
+          .map(({ chainId }) => chainId);
+
+        if (unsupportedChains.length > 0) {
+          throw rpcErrors.methodNotSupported(
+            `wallet_requestExecutionPermissions is not supported on chains '${unsupportedChains.join(', ')}'`,
+          );
+        }
+
+        for (const { permission } of params) {
+          const permissionType = permission?.type;
+
           if (!enabledTypes.includes(permissionType)) {
             throw rpcErrors.methodNotSupported(
               `Permission type '${permissionType ?? 'unknown'}' is not enabled`,
