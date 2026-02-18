@@ -20,7 +20,7 @@ jobs:
 
       - name: Checkout and setup environment
         if: steps.extract_version.outputs.version
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true

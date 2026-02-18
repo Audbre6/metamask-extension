@@ -21,9 +21,9 @@ on:
     # especially the Monday morning list, which is otherwise usually a fake empty.
     - cron: '0 2-6 * * *'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
-  cancel-in-progress: ${{ !(contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/stable')) }}
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+#   cancel-in-progress: ${{ !(contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/stable')) }}
 
 env:
   # For a `pull_request` event, the branch is `github.head_ref``.
@@ -54,7 +54,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -75,7 +75,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         id: checkout-and-setup
         with:
           is-high-risk-environment: false
@@ -108,7 +108,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -324,7 +324,7 @@ jobs:
       SELENIUM_BROWSER: chrome
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -432,7 +432,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -479,7 +479,7 @@ jobs:
       lavamoat-policy-changed: ${{ steps.lavamoat-policy-changed.outputs.lavamoat-policy-changed }}
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true

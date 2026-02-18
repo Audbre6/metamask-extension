@@ -92,7 +92,7 @@ jobs:
       VAPID_KEY: ${{ secrets.VAPID_KEY }}
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: true
           skip-allow-scripts: true

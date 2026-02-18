@@ -35,7 +35,7 @@ jobs:
       BENCHMARK_PAGE_LOADS: ${{ inputs.page-loads }}
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup
+        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
