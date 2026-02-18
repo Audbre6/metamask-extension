@@ -553,9 +553,11 @@ export class RewardsController extends BaseController<
         Buffer.from(hotWalletMessage, 'utf8').toString('base64'),
       );
       // Bitcoin signatures are typically hex-encoded, return as-is or convert if needed
-      return { signature: result.signature.startsWith('0x')
-        ? result.signature
-        : `0x${result.signature}` };
+      return {
+        signature: result.signature.startsWith('0x')
+          ? result.signature
+          : `0x${result.signature}`,
+      };
     } else if (isTronAddress(account.address)) {
       if (this.#isTronDisabled()) {
         throw new Error('Unsupported account type for signing rewards message');
@@ -569,9 +571,11 @@ export class RewardsController extends BaseController<
         Buffer.from(hotWalletMessage, 'utf8').toString('base64'),
       );
       // Tron signatures are typically hex-encoded, return as-is or convert if needed
-      return { signature: result.signature.startsWith('0x')
-        ? result.signature
-        : `0x${result.signature}` };
+      return {
+        signature: result.signature.startsWith('0x')
+          ? result.signature
+          : `0x${result.signature}`,
+      };
     } else if (isEvm) {
       const result = await this.#signEvmMessage(account, hotWalletMessage);
       return { signature: result };
@@ -825,6 +829,7 @@ export class RewardsController extends BaseController<
       this.convertInternalAccountToCaipAccountId(internalAccount);
 
     let shouldSkip: boolean;
+    let effectiveRespectSkipSilentAuth = respectSkipSilentAuth;
 
     const hardwareAcc = isHardwareAccount(internalAccount);
 
@@ -834,7 +839,7 @@ export class RewardsController extends BaseController<
       (!hardwareWalletSignResult?.challenge ||
         !hardwareWalletSignResult?.signature)
     ) {
-      respectSkipSilentAuth = true;
+      effectiveRespectSkipSilentAuth = true;
       shouldSkip = true;
     } else {
       shouldSkip = account
@@ -842,7 +847,7 @@ export class RewardsController extends BaseController<
         : false;
     }
 
-    if (shouldSkip && respectSkipSilentAuth) {
+    if (shouldSkip && effectiveRespectSkipSilentAuth) {
       // This means that we'll have a record for this account
       let accountState = this.#getAccountState(account as CaipAccountId);
       if (accountState) {
@@ -875,7 +880,7 @@ export class RewardsController extends BaseController<
     let subscription: SubscriptionDto | null = null;
     let authUnexpectedError = false;
 
-    if (respectSkipSilentAuth && !shouldSkip) {
+    if (effectiveRespectSkipSilentAuth && !shouldSkip) {
       // First, check opt-in status before attempting login
       try {
         const optInStatusResult = await this.getOptInStatus({
@@ -1099,9 +1104,10 @@ export class RewardsController extends BaseController<
             const shouldRecheckFresh =
               !accountState.lastFreshOptInStatusCheck ||
               Date.now() - accountState.lastFreshOptInStatusCheck >
-              NOT_OPTED_IN_OIS_STALE_CACHE_THRESHOLD_MS;
+                NOT_OPTED_IN_OIS_STALE_CACHE_THRESHOLD_MS;
             if (
-              (accountState.hasOptedIn === false || (accountState.hasOptedIn && !accountState.subscriptionId)) &&
+              (accountState.hasOptedIn === false ||
+                (accountState.hasOptedIn && !accountState.subscriptionId)) &&
               shouldRecheckFresh
             ) {
               // Force a fresh check for this not-opted-in account
@@ -1181,14 +1187,17 @@ export class RewardsController extends BaseController<
           const hasOptedIn = freshOptInResults[i];
           const subscriptionId =
             Array.isArray(freshSubscriptionIds) &&
-              i < freshSubscriptionIds.length
+            i < freshSubscriptionIds.length
               ? freshSubscriptionIds[i]
               : null;
           const internalAccount = addressToAccountMap.get(
             address.toLowerCase(),
           );
 
-          const canUseSubscriptionId = subscriptionId && (this.#getSubscriptionToken(subscriptionId) || (internalAccount && !isHardwareAccount(internalAccount)));
+          const canUseSubscriptionId =
+            subscriptionId &&
+            (this.#getSubscriptionToken(subscriptionId) ||
+              (internalAccount && !isHardwareAccount(internalAccount)));
 
           if (internalAccount) {
             const caipAccount =
@@ -1199,14 +1208,17 @@ export class RewardsController extends BaseController<
                 // Update or create account state with fresh opt-in status
                 if (state.rewardsAccounts[caipAccount]) {
                   state.rewardsAccounts[caipAccount].hasOptedIn = hasOptedIn;
-                  state.rewardsAccounts[caipAccount].subscriptionId = canUseSubscriptionId ? subscriptionId : null;
+                  state.rewardsAccounts[caipAccount].subscriptionId =
+                    canUseSubscriptionId ? subscriptionId : null;
                   state.rewardsAccounts[caipAccount].lastFreshOptInStatusCheck =
                     lastFreshOptInStatusCheck;
                 } else {
                   state.rewardsAccounts[caipAccount] = {
                     account: caipAccount,
                     hasOptedIn,
-                    subscriptionId: canUseSubscriptionId ? subscriptionId : null,
+                    subscriptionId: canUseSubscriptionId
+                      ? subscriptionId
+                      : null,
                     perpsFeeDiscount: null,
                     lastPerpsDiscountRateFetched: null,
                     lastFreshOptInStatusCheck,
@@ -1215,7 +1227,8 @@ export class RewardsController extends BaseController<
 
                 if (state.rewardsActiveAccount?.account === caipAccount) {
                   state.rewardsActiveAccount.hasOptedIn = hasOptedIn;
-                  state.rewardsActiveAccount.subscriptionId = canUseSubscriptionId ? subscriptionId : null;
+                  state.rewardsActiveAccount.subscriptionId =
+                    canUseSubscriptionId ? subscriptionId : null;
                   state.rewardsActiveAccount.lastFreshOptInStatusCheck =
                     lastFreshOptInStatusCheck;
                 }
@@ -1514,7 +1527,7 @@ export class RewardsController extends BaseController<
 
               if (
                 this.state.rewardsActiveAccount?.subscriptionId ===
-                subscriptionId &&
+                  subscriptionId &&
                 !isHardwareAccount(account as InternalAccount)
               ) {
                 await this.performSilentAuth(account, false, false); // try and auth.
@@ -2031,7 +2044,7 @@ export class RewardsController extends BaseController<
         // Defensive: Ensure sids is an array and i is within bounds
         let subscriptionId =
           Array.isArray(optInStatusResponse?.sids) &&
-            i < optInStatusResponse.sids.length
+          i < optInStatusResponse.sids.length
             ? optInStatusResponse.sids[i]
             : null;
         const sessionToken = subscriptionId
