@@ -1,6 +1,7 @@
 export { PerpsRecentActivity } from './perps-recent-activity';
 export type { PerpsRecentActivityProps } from './perps-recent-activity';
 export { PerpsTabView } from './perps-tab-view';
+export { PerpsToastProvider, usePerpsToast } from './perps-toast';
 export { PerpsTutorialModal } from './perps-tutorial-modal';
 export {
   getDisplayName,

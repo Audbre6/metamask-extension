@@ -127,6 +127,7 @@ import { DeprecatedNetworkModal } from '../settings/deprecated-network-modal/Dep
 import NetworkConfirmationPopover from '../../components/multichain/network-list-menu/network-confirmation-popover/network-confirmation-popover';
 import { ToastMaster } from '../../components/app/toast-master/toast-master';
 import { type DynamicImportType, mmLazy } from '../../helpers/utils/mm-lazy';
+import { PerpsToastProvider } from '../../components/app/perps/perps-toast';
 import CrossChainSwapTxDetails from '../bridge/transaction-details/transaction-details';
 import {
   isCorrectDeveloperTransactionType,
@@ -348,28 +349,36 @@ const PerpsActivityPage = mmLazy(
 const WrappedPerpsHomePage = () => (
   <PerpsRouteWrapper>
     <PerpsControllerProvider>
-      <PerpsHomePage />
+      <PerpsToastProvider>
+        <PerpsHomePage />
+      </PerpsToastProvider>
     </PerpsControllerProvider>
   </PerpsRouteWrapper>
 );
 const WrappedPerpsMarketDetailPage = () => (
   <PerpsRouteWrapper>
     <PerpsControllerProvider>
-      <PerpsMarketDetailPage />
+      <PerpsToastProvider>
+        <PerpsMarketDetailPage />
+      </PerpsToastProvider>
     </PerpsControllerProvider>
   </PerpsRouteWrapper>
 );
 const WrappedMarketListView = () => (
   <PerpsRouteWrapper>
     <PerpsControllerProvider>
-      <MarketListView />
+      <PerpsToastProvider>
+        <MarketListView />
+      </PerpsToastProvider>
     </PerpsControllerProvider>
   </PerpsRouteWrapper>
 );
 const WrappedPerpsActivityPage = () => (
   <PerpsRouteWrapper>
     <PerpsControllerProvider>
-      <PerpsActivityPage />
+      <PerpsToastProvider>
+        <PerpsActivityPage />
+      </PerpsToastProvider>
     </PerpsControllerProvider>
   </PerpsRouteWrapper>
 );

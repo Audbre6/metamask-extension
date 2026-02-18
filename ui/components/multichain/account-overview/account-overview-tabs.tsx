@@ -31,7 +31,7 @@ import AssetList from '../../app/assets/asset-list';
 import DeFiTab from '../../app/assets/defi-list/defi-tab';
 import NftsTab from '../../app/assets/nfts/nfts-tab';
 import UnifiedTransactionList from '../../app/transaction-list/unified-transaction-list.component';
-import { PerpsTabView } from '../../app/perps';
+import { PerpsTabView, PerpsToastProvider } from '../../app/perps';
 import { Tab, Tabs } from '../../ui/tabs';
 import { useTokenBalances } from '../../../hooks/useTokenBalances';
 import { AccountOverviewCommonProps } from './common';
@@ -176,7 +176,9 @@ export const AccountOverviewTabs = ({
             data-testid="account-overview__perps-tab"
           >
             <ErrorBoundary key="perps">
-              <PerpsTabView />
+              <PerpsToastProvider>
+                <PerpsTabView />
+              </PerpsToastProvider>
             </ErrorBoundary>
           </Tab>
         )}

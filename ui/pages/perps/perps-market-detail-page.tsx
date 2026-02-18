@@ -69,6 +69,7 @@ import {
   type OrderMode,
 } from '../../components/app/perps/order-entry';
 import { EditMarginExpandable } from '../../components/app/perps/edit-margin';
+import { usePerpsToast } from '../../components/app/perps/perps-toast';
 import { TextField, TextFieldSize } from '../../components/component-library';
 import InfoTooltip from '../../components/ui/info-tooltip/info-tooltip';
 import {
@@ -225,6 +226,7 @@ const PerpsMarketDetailPage: React.FC = () => {
     formatPercentWithMinThreshold,
   } = useFormatters();
   const fundingCountdown = useFundingCountdown();
+  const { replacePerpsToast } = usePerpsToast();
 
   // Use stream hooks for real-time data
   const { positions: allPositions } = usePerpsLivePositions();
@@ -879,6 +881,18 @@ const PerpsMarketDetailPage: React.FC = () => {
       return;
     }
 
+    let inProgressToastMessage = t('perpsToastSubmitInProgress');
+    if (orderMode === 'close') {
+      inProgressToastMessage = t('perpsToastCloseInProgress');
+    } else if (orderMode === 'modify') {
+      inProgressToastMessage = t('perpsToastUpdateInProgress');
+    }
+
+    replacePerpsToast({
+      message: inProgressToastMessage,
+      variant: 'info',
+    });
+
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -900,6 +914,10 @@ const PerpsMarketDetailPage: React.FC = () => {
         if (!result.success) {
           throw new Error(result.error || 'Failed to close position');
         }
+        replacePerpsToast({
+          message: t('perpsToastTradeSuccess'),
+          variant: 'success',
+        });
       } else if (orderMode === 'modify' && position) {
         // Modify position mode - always update TP/SL (pass undefined to clear when disabled)
         // Strip commas from formatted price strings before sending to API
@@ -920,6 +938,10 @@ const PerpsMarketDetailPage: React.FC = () => {
         if (!result.success) {
           throw new Error(result.error || 'Failed to update TP/SL');
         }
+        replacePerpsToast({
+          message: t('perpsToastUpdateSuccess'),
+          variant: 'success',
+        });
       } else {
         // New order mode
         const orderParams = formStateToOrderParams(
@@ -934,12 +956,21 @@ const PerpsMarketDetailPage: React.FC = () => {
         }
 
         if (orderFormState.type === 'limit') {
+          replacePerpsToast({
+            message: t('perpsToastOrderSubmitted'),
+            variant: 'success',
+          });
           // Limit orders rest on the orderbook — return to detail view immediately.
           // The resting order will appear in the orders section via usePerpsLiveOrders stream.
           setCurrentView('detail');
           setOrderMode('new');
           return;
         }
+
+        replacePerpsToast({
+          message: t('perpsToastTradeSuccess'),
+          variant: 'success',
+        });
 
         // Market orders — wait for position to appear in stream before navigating
         setPendingOrderSymbol(orderFormState.asset);
@@ -953,6 +984,17 @@ const PerpsMarketDetailPage: React.FC = () => {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred';
       setSubmitError(errorMessage);
+      let failureToastMessage = t('perpsToastOrderFailed');
+      if (orderMode === 'close') {
+        failureToastMessage = t('perpsToastCloseFailed');
+      } else if (orderMode === 'modify') {
+        failureToastMessage = t('perpsToastUpdateFailed');
+      }
+      replacePerpsToast({
+        description: errorMessage,
+        message: failureToastMessage,
+        variant: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -963,6 +1005,8 @@ const PerpsMarketDetailPage: React.FC = () => {
     orderMode,
     position,
     currentPrice,
+    replacePerpsToast,
+    t,
   ]);
 
   // Initialize TP/SL editing values only when the card is first expanded
@@ -1013,6 +1057,10 @@ const PerpsMarketDetailPage: React.FC = () => {
 
     setIsSavingTPSL(true);
     setTpslError(null);
+    replacePerpsToast({
+      message: t('perpsToastUpdateInProgress'),
+      variant: 'info',
+    });
 
     try {
       const controller = await getPerpsController(selectedAddress);
@@ -1072,15 +1120,31 @@ const PerpsMarketDetailPage: React.FC = () => {
 
       // Success - collapse the card
       setIsAutoCloseExpanded(false);
+      replacePerpsToast({
+        message: t('perpsToastUpdateSuccess'),
+        variant: 'success',
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'An unknown error occurred';
       setTpslError(errorMessage);
+      replacePerpsToast({
+        description: errorMessage,
+        message: t('perpsToastUpdateFailed'),
+        variant: 'error',
+      });
       console.error('TP/SL update failed:', error);
     } finally {
       setIsSavingTPSL(false);
     }
-  }, [isEligible, selectedAddress, editingTpPrice, editingSlPrice]);
+  }, [
+    isEligible,
+    selectedAddress,
+    editingTpPrice,
+    editingSlPrice,
+    replacePerpsToast,
+    t,
+  ]);
 
   // Refetch positions when tab becomes visible (catch changes made elsewhere)
   useEffect(() => {
