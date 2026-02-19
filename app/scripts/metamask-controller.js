@@ -1195,10 +1195,12 @@ export default class MetamaskController extends EventEmitter {
 
         const supportedChains = getEip7702SupportedChains(
           this.remoteFeatureFlagController.state,
-        );
+        ).map((chainId) => chainId.toLowerCase());
 
         const unsupportedChains = params
-          .filter(({ chainId }) => !supportedChains.includes(chainId))
+          .filter(
+            ({ chainId }) => !supportedChains.includes(chainId?.toLowerCase()),
+          )
           .map(({ chainId }) => chainId);
 
         if (unsupportedChains.length > 0) {
