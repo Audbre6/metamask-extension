@@ -875,6 +875,7 @@
       "globals": {
         "clearInterval": true,
         "console.error": true,
+        "console.log": true,
         "setInterval": true
       },
       "packages": {

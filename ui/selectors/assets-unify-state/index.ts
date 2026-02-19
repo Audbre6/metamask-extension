@@ -4,3 +4,7 @@ export {
   getIsAssetsUnifyStateEnabled,
   type AssetsUnifyStateFeatureFlagType,
 } from './feature-flags';
+export {
+  selectAggregatedBalanceForSelectedAccount,
+  type AggregatedBalanceForAccount,
+} from './aggregated-balance';

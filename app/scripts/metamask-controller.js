@@ -44,6 +44,7 @@ import {
   SnapEndowments,
 } from '@metamask/snaps-rpc-methods';
 import { ERC1155, ERC20, ERC721, toHex } from '@metamask/controller-utils';
+import { getAggregatedBalanceForAccount } from '@metamask/assets-controller';
 
 import { wordlist } from '@metamask/scure-bip39/dist/wordlists/english';
 
@@ -2440,11 +2441,66 @@ export default class MetamaskController extends EventEmitter {
     const { vault } = this.keyringController.state;
     const isInitialized = Boolean(vault);
     const flatState = this.memStore.getFlatState();
+    const sanitized = sanitizeUIState(flatState);
+
+    let aggregatedBalanceForSelectedAccount = null;
+    if (this.assetsController) {
+      aggregatedBalanceForSelectedAccount =
+        this._getAggregatedBalanceFromState(sanitized);
+    }
 
     return {
       isInitialized,
-      ...sanitizeUIState(flatState),
+      ...sanitized,
+      aggregatedBalanceForSelectedAccount,
     };
+  }
+
+  /**
+   * Returns aggregated balance for the selected account from a given state snapshot.
+   * Used when building getState() so the UI can read it via a selector without importing @metamask/assets-controller.
+   *
+   * @param {object} state - State snapshot (e.g. sanitized flat state)
+   * @returns {{ entries: Array<{ assetId: string; amount: string }>; totalBalanceInFiat?: number } | null}
+   */
+  _getAggregatedBalanceFromState(state) {
+    const selectedAccountId = state.internalAccounts?.selectedAccount;
+    if (!selectedAccountId) {
+      return null;
+    }
+    const accountsById = state.internalAccounts?.accounts ?? {};
+    const selectedInternalAccount = accountsById[selectedAccountId];
+    if (!selectedInternalAccount) {
+      return null;
+    }
+    const assetsControllerState = {
+      assetsInfo: state.assetsInfo ?? {},
+      assetsMetadata: state.assetsMetadata ?? {},
+      assetsBalance: state.assetsBalance ?? {},
+      assetsPrice: state.assetsPrice ?? {},
+      assetPreferences: state.assetPreferences ?? {},
+      customAssets: state.customAssets ?? {},
+    };
+    const enabledNetworkMap = state.enabledNetworkMap;
+    const accountTreeState = state.accountTree
+      ? {
+          accountTree: state.accountTree,
+          isAccountTreeSyncingInProgress:
+            state.isAccountTreeSyncingInProgress ?? false,
+          hasAccountTreeSyncingSyncedAtLeastOnce:
+            state.hasAccountTreeSyncingSyncedAtLeastOnce ?? false,
+          accountGroupsMetadata: state.accountGroupsMetadata ?? {},
+          accountWalletsMetadata: state.accountWalletsMetadata ?? {},
+        }
+      : undefined;
+    return getAggregatedBalanceForAccount(
+      assetsControllerState,
+      selectedInternalAccount,
+      enabledNetworkMap,
+      accountTreeState,
+      undefined,
+      accountsById,
+    );
   }
 
   /**
