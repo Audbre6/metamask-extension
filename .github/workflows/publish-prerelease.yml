@@ -39,7 +39,7 @@ jobs:
       POST_NEW_BUILDS: ${{ inputs.post-new-builds }}
     steps:
       - name: Checkout and setup high risk environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: true
           skip-allow-scripts: true

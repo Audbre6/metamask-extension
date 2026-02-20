@@ -54,7 +54,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -75,7 +75,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         id: checkout-and-setup
         with:
           is-high-risk-environment: false
@@ -108,7 +108,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -324,7 +324,7 @@ jobs:
       SELENIUM_BROWSER: chrome
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -432,7 +432,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
@@ -479,7 +479,7 @@ jobs:
       lavamoat-policy-changed: ${{ steps.lavamoat-policy-changed.outputs.lavamoat-policy-changed }}
     steps:
       - name: Checkout and setup environment
-        uses: MetaMask/action-checkout-and-setup@prep-deps-speedup-test
+        uses: MetaMask/action-checkout-and-setup@fix-hydrate-input
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
