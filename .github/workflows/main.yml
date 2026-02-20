@@ -357,12 +357,63 @@ jobs:
       - build-test-browserify
     if: ${{ needs.get-requirements.outputs.needs-benchmarks == 'true' }}
     uses: ./.github/workflows/page-load-benchmark.yml
-    secrets:
-      EXTENSION_BENCHMARK_STATS_TOKEN: ${{ secrets.EXTENSION_BENCHMARK_STATS_TOKEN }}
     with:
       browser-loads: 10
       page-loads: 10
       builds-from-run: ${{ needs.get-requirements.outputs.builds-from-run }}
+
+  # Consolidated job that stores all benchmark results (page load + UI startup)
+  # to MetaMask/extension_benchmark_stats for historical comparison in PR comments.
+  # Runs on pushes to main and release/* branches only (not on PRs or forks).
+  # Historical data is stored per-branch so PR comments compare against the
+  # correct release branch baseline, not always main.
+  store-benchmark-stats:
+    needs:
+      - get-requirements
+      - run-benchmarks
+      - page-load-benchmark
+    if: |
+      ${{ !cancelled() &&
+          github.event_name == 'push' &&
+          (github.ref_name == 'main' || startsWith(github.ref, 'refs/heads/release/')) &&
+          needs.get-requirements.outputs.needs-benchmarks == 'true' &&
+          env.IS_FORK == 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EXTENSION_BENCHMARK_STATS_TOKEN: ${{ secrets.EXTENSION_BENCHMARK_STATS_TOKEN }}
+      HEAD_COMMIT_HASH: ${{ github.sha }}
+      OWNER: ${{ github.repository_owner }}
+      BRANCH_NAME: ${{ github.ref_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all UI startup benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: benchmark-*.json
+          path: benchmark-results/
+          merge-multiple: true
+
+      - name: Commit UI startup stats to extension_benchmark_stats
+        run: .github/scripts/benchmark-stats-commit.sh
+        env:
+          BENCHMARK_DATA_TYPE: ui-startup
+          BENCHMARK_RESULTS_DIR: benchmark-results
+
+      - name: Download page load benchmark artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: page-load-benchmark-results
+          path: test-artifacts/benchmarks/
+          if-no-files-found: warn
+
+      - name: Commit page load stats to extension_benchmark_stats
+        run: .github/scripts/benchmark-stats-commit.sh
+        env:
+          BENCHMARK_DATA_TYPE: page-load
+          BENCHMARK_FILE: test-artifacts/benchmarks/page-load-benchmark-results.json
 
   prep-e2e:
     needs:

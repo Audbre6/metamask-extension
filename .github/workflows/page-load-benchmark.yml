@@ -17,9 +17,6 @@ on:
         required: true
         type: string
         description: The run ID to get builds from
-    secrets:
-      EXTENSION_BENCHMARK_STATS_TOKEN:
-        required: true
 
 jobs:
   page-load-benchmark-pr:
@@ -60,8 +57,3 @@ jobs:
           name: page-load-benchmark-results
           path: test-artifacts/benchmarks/page-load-benchmark-results.json
 
-      - name: Upload benchmark results (historical data)
-        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        run: .github/scripts/benchmark-stats-commit.sh
-        env:
-          EXTENSION_BENCHMARK_STATS_TOKEN: ${{ secrets.EXTENSION_BENCHMARK_STATS_TOKEN }}
