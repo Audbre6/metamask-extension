@@ -74,13 +74,13 @@ assemble_ui_startup_data() {
         exit 1
     fi
 
-    # Page load presets run on ALL browser/buildType combinations (chrome/firefox × browserify/webpack).
+    # Startup presets run on ALL browser/buildType combinations (chrome/firefox × browserify/webpack).
     # They are stored under the "pageLoad" group, keyed as "{browser}-{buildType}-{preset}"
-    # so each combination has its own historical entry (e.g. "chrome-browserify-standardHome").
+    # so each combination has its own historical entry (e.g. "chrome-browserify-startupStandardHome").
     #
-    # User action and performance presets only run on chrome-browserify (the canonical production
-    # target) and are stored under their own preset key (e.g. "userActions", "performanceAssets").
-    local PAGE_LOAD_PRESETS=("standardHome" "powerUserHome")
+    # Interaction and user-journey presets only run on chrome-browserify (the canonical production
+    # target) and are stored under their own preset key (e.g. "interactionUserActions", "userJourneyAssets").
+    local PAGE_LOAD_PRESETS=("startupStandardHome" "startupPowerUserHome")
 
     local presets_json="{}"
     local page_load_json="{}"
@@ -114,11 +114,13 @@ assemble_ui_startup_data() {
         done
 
         if [[ "${is_page_load}" == true ]]; then
-            # Store all browser/buildType combinations for page load presets.
-            # Unwrap the outer key (benchmark JSON wraps result in { "<presetName>": {...} }).
+            # Store all browser/buildType combinations for startup presets.
+            # Unwrap the outer key (benchmark JSON wraps result in { "<fileBaseName>": {...} }).
+            # The JSON key is derived from the flow file name (e.g. standard-home.ts → "standardHome"),
+            # not from the preset name in the artifact filename (e.g. "startupStandardHome"),
+            # so we unwrap by position (.[keys[0]]) rather than by name.
             local preset_data page_load_key
-            preset_data=$(jq --arg key "${preset_name}" \
-                'if (keys | length) == 1 and has($key) then .[$key] else . end' "${file}")
+            preset_data=$(jq 'if (keys | length) == 1 then .[keys[0]] else . end' "${file}")
             page_load_key="${browser}-${build_type}-${preset_name}"
             echo "  Adding page load preset '${page_load_key}'"
             page_load_json=$(echo "${page_load_json}" | jq \

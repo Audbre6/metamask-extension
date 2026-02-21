@@ -2,8 +2,9 @@
  * Historical data fetch and aggregation for UI startup benchmarks.
  *
  * Stores and retrieves benchmark data from MetaMask/extension_benchmark_stats
- * for all Selenium-based presets (standardHome, powerUserHome, userActions,
- * performance*). Follows the same pattern as page-load-benchmark-pr-comment.ts.
+ * for all Selenium-based presets (startupStandardHome, startupPowerUserHome,
+ * interactionUserActions, userJourney*). Follows the same pattern as
+ * page-load-benchmark-pr-comment.ts.
  *
  */
 import type { BenchmarkEntryResult } from './utils';
@@ -19,9 +20,9 @@ const DEFAULT_N_COMMITS = 1;
  * All presets in ui_startup_data.json share the same nested shape:
  * preset name → benchmark name → benchmark result.
  *
- * - pageLoad:         { "standardHome": { "mean": {...} }, "powerUserHome": { "mean": {...} } }
- * - userActions:      { "loadNewAccount": { "mean": {...} }, "confirmTx": { "mean": {...} } }
- * - performance*:     { "signTypedData": { "mean": {...} }, ... }
+ * - pageLoad:            { "chrome-browserify-startupStandardHome": { "mean": {...} }, ... }
+ * - interactionUserActions: { "loadNewAccount": { "mean": {...} }, "confirmTx": { "mean": {...} } }
+ * - userJourney*:      { "signTypedData": { "mean": {...} }, ... }
  */
 type NestedPresetEntry = Record<string, Partial<BenchmarkEntryResult>>;
 
@@ -130,7 +131,7 @@ async function listReleaseBranchesByVersion(): Promise<string[]> {
  *
  * @param baseBranch - PR target branch (e.g. "release/12.6.0").
  *                     Defaults to GITHUB_BASE_REF, falling back to "main".
- * @param n - Number of recent commits to aggregate (default 10).
+ * @param n - Number of recent commits to aggregate (default 1).
  * @returns Reference map (benchmarkName → metric → mean), or null if unavailable.
  */
 export async function fetchHistoricalUiStartupData(
