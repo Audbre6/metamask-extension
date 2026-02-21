@@ -27,7 +27,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Validate LavaMoat build policy
         run: yarn lavamoat:build:auto
@@ -49,7 +48,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Validate LavaMoat webapp policy
         run: yarn lavamoat:webapp:auto
@@ -71,7 +69,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Validate LavaMoat webpack build policy
         run: yarn webpack:tsc && yarn webpack:lavamoat:policy:build
@@ -93,7 +90,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Validate LavaMoat webpack MV2 policy
         run: yarn webpack:tsc && yarn webpack:lavamoat:policy:mv2
@@ -115,7 +111,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Validate LavaMoat webpack MV3 policy
         run: yarn webpack:tsc && yarn webpack:lavamoat:policy:mv3

@@ -19,7 +19,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Get changed files with git diff
         # On branch `stable`, there's no reason to do a diff

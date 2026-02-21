@@ -15,7 +15,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Check attributions changes
         run: yarn attributions:check

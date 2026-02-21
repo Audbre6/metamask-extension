@@ -27,7 +27,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Check PR has required labels
         env:

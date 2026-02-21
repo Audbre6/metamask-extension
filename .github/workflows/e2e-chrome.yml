@@ -143,7 +143,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Download test results
         uses: actions/download-artifact@v7

@@ -18,7 +18,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Check template and add labels
         id: check-template-and-add-labels

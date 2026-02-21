@@ -20,7 +20,6 @@ jobs:
         with:
           is-high-risk-environment: true
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Build ts migration dashboard
         run: yarn ts-migration:dashboard:build

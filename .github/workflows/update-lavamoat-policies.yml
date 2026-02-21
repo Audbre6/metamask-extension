@@ -62,7 +62,6 @@ jobs:
           is-high-risk-environment: false
           cache-node-modules: true
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Get commit SHA
         if: ${{ steps.is-fork.outputs.IS_FORK == 'false' }}
@@ -91,7 +90,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Update LavaMoat build policy
         run: yarn lavamoat:build:auto
@@ -125,7 +123,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Restore build policy
         uses: actions/cache/restore@v5
@@ -165,7 +162,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Update LavaMoat webpack build policy
         run: yarn webpack:tsc && yarn webpack:lavamoat:policy:build
@@ -199,7 +195,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Restore webpack build policy
         uses: actions/cache/restore@v5
@@ -240,7 +235,6 @@ jobs:
         with:
           is-high-risk-environment: false
           skip-allow-scripts: true
-          use-yarn-hydrate: true
 
       - name: Restore webpack build policy
         uses: actions/cache/restore@v5
